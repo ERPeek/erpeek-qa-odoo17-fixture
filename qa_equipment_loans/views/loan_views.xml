@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_equipment_loan_tree" model="ir.ui.view">
+        <field name="name">qa.equipment.loan.tree</field>
+        <field name="model">qa.equipment.loan</field>
+        <field name="arch" type="xml">
+            <tree string="Equipment Loans">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="loan_date"/>
+                <field name="state"/>
+                <field name="quantity"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_equipment_loan_form" model="ir.ui.view">
+        <field name="name">qa.equipment.loan.form</field>
+        <field name="model">qa.equipment.loan</field>
+        <field name="arch" type="xml">
+            <form string="Equipment Loan">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="partner_id"/>
+                        <field name="loan_date"/>
+                        <field name="return_date"/>
+                        <field name="state"/>
+                        <field name="quantity"/>
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_equipment_loans" model="ir.actions.act_window">
+        <field name="name">Equipment Loans</field>
+        <field name="res_model">qa.equipment.loan</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_equipment_loans_root" name="Equipment Loans" action="action_equipment_loans"/>
+</odoo>
