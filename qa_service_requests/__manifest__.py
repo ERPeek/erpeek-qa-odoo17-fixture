@@ -1,6 +1,6 @@
 {
     'name': 'QA Service Requests',
-    'version': '18.0.1.0.0',
+    'version': '19.0.1.0.0',
     'summary': 'QA fixture module for the ERPeek Migration Pipeline 18.0 to 19.0 test',
     'category': 'Sales',
     'author': 'ERPeek QA',

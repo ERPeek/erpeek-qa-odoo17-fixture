@@ -2,7 +2,7 @@ from odoo import fields, models
 
 
 class SaleOrder(models.Model):
-    _inherit = 'sale.order'
+    _inherit = ['sale.order']
 
     service_request_ids = fields.One2many('qa.service.request', 'sale_order_id', string='Service Requests')
     service_request_count = fields.Integer(compute='_compute_service_request_count')
