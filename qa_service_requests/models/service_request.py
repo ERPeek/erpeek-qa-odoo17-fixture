@@ -3,7 +3,7 @@
 # odoo.osv.expression (odoo.fields.Domain) and read_group (_read_group).
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
-from odoo.osv import expression
+from odoo.fields import Domain
 
 
 class QaServiceRequest(models.Model):
@@ -28,10 +28,14 @@ class QaServiceRequest(models.Model):
     partner_request_count = fields.Integer(compute='_compute_partner_request_count')
     reference = fields.Char(copy=False)
 
-    _sql_constraints = [
-        ('reference_unique', 'unique(reference)', 'The reference must be unique.'),
-        ('hours_positive', 'CHECK(hours >= 0)', 'Hours cannot be negative.'),
-    ]
+    _reference_unique = models.Constraint(
+        'unique(reference)',
+        'The reference must be unique.',
+    )
+    _hours_positive = models.Constraint(
+        'CHECK(hours >= 0)',
+        'Hours cannot be negative.',
+    )
 
     @api.depends('hours', 'hourly_rate')
     def _compute_amount(self):
@@ -39,10 +43,10 @@ class QaServiceRequest(models.Model):
             rec.amount = rec.hours * rec.hourly_rate
 
     def _compute_partner_request_count(self):
-        groups = self.read_group(
-            [('partner_id', 'in', self.partner_id.ids)], ['partner_id'], ['partner_id'],
+        groups = self._read_group(
+            [('partner_id', 'in', self.partner_id.ids)], ['partner_id'], ['__count'],
         )
-        counts = {g['partner_id'][0]: g['partner_id_count'] for g in groups}
+        counts = {partner.id: count for partner, count in groups}
         for rec in self:
             rec.partner_request_count = counts.get(rec.partner_id.id, 0)
 
@@ -54,17 +58,17 @@ class QaServiceRequest(models.Model):
         return super().create(vals_list)
 
     def _open_domain(self):
-        return expression.AND([
-            [('state', 'in', ('new', 'in_progress'))],
-            [('user_id', '=', self.env.uid)],
-        ])
+        return (
+            Domain('state', 'in', ('new', 'in_progress'))
+            & Domain('user_id', '=', self.env.uid)
+        )
 
     def action_start(self):
         self.write({'state': 'in_progress'})
 
     def action_done(self):
-        manager = self.env.ref('qa_service_requests.group_service_manager')
-        if self.filtered(lambda r: r.hours <= 0) and manager not in self.env.user.groups_id:
+        is_manager = self.env.user.has_group('qa_service_requests.group_service_manager')
+        if self.filtered(lambda r: r.hours <= 0) and not is_manager:
             raise UserError(_('Only a service manager can close a request without hours.'))
         self.write({'state': 'done'})
 

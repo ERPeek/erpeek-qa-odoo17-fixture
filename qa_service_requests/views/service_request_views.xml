@@ -57,7 +57,7 @@
                 <field name="partner_id"/>
                 <filter name="my" string="My Requests" domain="[('user_id', '=', uid)]"/>
                 <filter name="open" string="Open" domain="[('state', 'in', ('new', 'in_progress'))]"/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
                 </group>
             </search>
